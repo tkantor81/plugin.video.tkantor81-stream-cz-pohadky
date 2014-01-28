@@ -30,8 +30,7 @@ if mode is None:
     parser = HTMLParser.HTMLParser()
     response = parser.unescape(url.read().decode('UTF-8'))
 
-    # TODO: do it more general
-    catalogue = re.findall('<a href="/pohadky/(.*)" class.*data-action="click:menu">\s*(.*)\s*<img src="(.*)" alt', response, re.I)
+    catalogue = re.findall('<a href="/pohadky/([^"]+)[^>]*>\s*(.*)\s*.*(?=<img)<img src="([^"]+)', response, re.I)
 
     for show_url, show_name, show_image in catalogue:
         url = build_url({'mode': 'show', 'show_url': show_url})
