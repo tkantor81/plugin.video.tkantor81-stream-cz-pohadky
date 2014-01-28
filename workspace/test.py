@@ -9,6 +9,7 @@ import HTMLParser
 url = urllib.urlopen('http://www.stream.cz/ajax/get_catalogue?dreams')
 parser = HTMLParser.HTMLParser()
 response = parser.unescape(url.read().decode('UTF-8'))
+print response
 catalogue = re.findall('<a href="/pohadky/(.*)" class.*data-action="click:menu">\s*(.*)\s*<img src="(.*)" alt', response)
 
 for show_url, show_name, show_image in catalogue:
