@@ -15,6 +15,7 @@ base_url = sys.argv[0]
 addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 
+my_addon = xbmcaddon.Addon(ADDON_ID)
 xbmcplugin.setContent(addon_handle, 'movies')
 
 # TODO: create notifications for newly added shows (configurable)
@@ -47,7 +48,6 @@ elif mode[0] == 'show':
     episodes = re.findall('data-episode-id="(\d+)"', response, re.I)
 
     # settings (0=Low, 1=Medium, 2=High)
-    my_addon = xbmcaddon.Addon(ADDON_ID)
     quality = int(my_addon.getSetting('quality')) + 1
 
     for episode_id in episodes:
@@ -60,12 +60,14 @@ elif mode[0] == 'show':
         episode_height = episode['instances'][quality]['instances'][0]['quality'][:3]
         episode_duration = episode['duration']
         episode_aspect = episode['aspect_ratio']
-        episode_image = 'http:' + episode['episode_image_original_url'] + '.jpg'
 
         li = xbmcgui.ListItem(episode_name, iconImage='DefaultVideo.png')
         li.addStreamInfo('video', {'codec': episode_type, 'aspect': episode_aspect, 'height': episode_height, 'duration': episode_duration})
         li.addStreamInfo('audio', {'language': 'cs'})
-        li.setThumbnailImage(episode_image)
+        if my_addon.getSetting('download_ep_thumbnails') == 'true':
+            episode_image = 'http:' + episode['episode_image_original_url'] + '.jpg'
+            li.setThumbnailImage(episode_image)
+            print 'obrazky'
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=episode_source, listitem=li)
 
     xbmcplugin.endOfDirectory(addon_handle)

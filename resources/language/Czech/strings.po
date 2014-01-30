@@ -38,3 +38,7 @@ msgstr "Střední"
 msgctxt "#30004"
 msgid "High"
 msgstr "Vysoká"
+
+msgctxt "#30005"
+msgid "Download episode thumbnails"
+msgstr "Stahovat náhledy epizod"
