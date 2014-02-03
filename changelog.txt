@@ -1,8 +1,9 @@
 v0.0.3
-- Download episode thumbnails setting
+- Added Download episode thumbnails setting
+- Play all and Shuffle play added to context menu
 
 v0.0.2
-- Added thumbnails, episodes metadata, quality setting, language files
+- Added thumbnails, episodes metadata, quality setting and language files
 
 v0.0.1
 - Initial version

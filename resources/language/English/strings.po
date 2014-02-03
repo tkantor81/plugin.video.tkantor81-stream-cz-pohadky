@@ -42,3 +42,13 @@ msgstr ""
 msgctxt "#30005"
 msgid "Download episode thumbnails"
 msgstr ""
+
+# Context menu
+
+msgctxt "#30006"
+msgid "Play all"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Shuffle play"
+msgstr ""

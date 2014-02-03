@@ -42,3 +42,13 @@ msgstr "Vysoká"
 msgctxt "#30005"
 msgid "Download episode thumbnails"
 msgstr "Stahovat náhledy epizod"
+
+# Context menu
+
+msgctxt "#30006"
+msgid "Play all"
+msgstr "Přehrát vše"
+
+msgctxt "#30007"
+msgid "Shuffle play"
+msgstr "Náhodné přehrávání"
