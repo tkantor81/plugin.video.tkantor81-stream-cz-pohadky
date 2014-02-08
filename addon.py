@@ -28,7 +28,7 @@ addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 
 my_addon = xbmcaddon.Addon(ADDON_ID)
-my_addon_name = my_addon.getAddonInfo('name').decode('UTF-8')
+my_addon_name = my_addon.getAddonInfo('name')
 my_addon_icon = my_addon.getAddonInfo('icon')
 level = args.get('level', None)
 xbmcplugin.setContent(addon_handle, 'movies')
@@ -43,7 +43,7 @@ if level is None:
     catalogue = re.findall('<a href="/pohadky/([^"]+)[^>]*>\s*(.*)\s*.*(?=<img)<img src="([^"]+)', response, re.I)
     # notify if catalogue is empty, log error and exit plugin
     if not catalogue:
-        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30008), NOTIFY_DURATION, my_addon_icon))
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30008).encode('UTF-8'), NOTIFY_DURATION, my_addon_icon))
         xbmc.executebuiltin('ReplaceWindow(Home)')
         sys.exit()
 
@@ -64,7 +64,7 @@ elif level[0] == 'show':
     episodes = re.findall('data-episode-id="(\d+)"', response, re.I)
     # notify if episodes are empty log error and return to catalogue
     if not episodes:
-        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30009), NOTIFY_DURATION, my_addon_icon))
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30009).encode('UTF-8'), NOTIFY_DURATION, my_addon_icon))
         xbmc.executebuiltin('RunPlugin(%s)' % base_url)
         sys.exit()
 
@@ -107,15 +107,11 @@ elif level[0] == 'show':
             xbmcplugin.addDirectoryItem(handle=addon_handle, url=episode_url, listitem=li)
 
     if mode == ShowMode.PLAY_ALL:
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30006).encode('UTF-8'), NOTIFY_DURATION, my_addon_icon))
         xbmc.Player().play(playlist)
-        print my_addon_name
-        print my_addon.getLocalizedString(30006)
-        print NOTIFY_DURATION
-        print my_addon_icon
-        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30006), NOTIFY_DURATION, my_addon_icon))
     elif mode == ShowMode.SHUFFLE_PLAY:
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30007).encode('UTF-8'), NOTIFY_DURATION, my_addon_icon))
         playlist.shuffle()
         xbmc.Player().play(playlist)
-        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30007), NOTIFY_DURATION, my_addon_icon))
 
 xbmcplugin.endOfDirectory(addon_handle)
