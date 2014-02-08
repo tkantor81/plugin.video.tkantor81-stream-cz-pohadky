@@ -11,6 +11,7 @@ import json
 import HTMLParser
 
 ADDON_ID = 'plugin.video.tkantor81-stream-cz-pohadky'
+NOTIFY_DURATION = 5000
 
 
 class ShowMode(object):
@@ -27,6 +28,8 @@ addon_handle = int(sys.argv[1])
 args = urlparse.parse_qs(sys.argv[2][1:])
 
 my_addon = xbmcaddon.Addon(ADDON_ID)
+my_addon_name = my_addon.getAddonInfo('name').decode('UTF-8')
+my_addon_icon = my_addon.getAddonInfo('icon')
 level = args.get('level', None)
 xbmcplugin.setContent(addon_handle, 'movies')
 
@@ -38,14 +41,18 @@ if level is None:
     response = parser.unescape(url.read().decode('UTF-8'))
 
     catalogue = re.findall('<a href="/pohadky/([^"]+)[^>]*>\s*(.*)\s*.*(?=<img)<img src="([^"]+)', response, re.I)
-    # TODO: notify if catalogue is empty and exit plugin
+    # notify if catalogue is empty, log error and exit plugin
+    if not catalogue:
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30008), NOTIFY_DURATION, my_addon_icon))
+        xbmc.executebuiltin('ReplaceWindow(Home)')
+        sys.exit()
 
     for show_url, show_name, show_image in catalogue:
-        url = build_url({'level': 'show', 'show_url': show_url, "mode": ShowMode.LIST_EPISODES})
+        url = build_url({'level': 'show', 'show_url': show_url, 'mode': ShowMode.LIST_EPISODES})
         li = xbmcgui.ListItem(show_name, iconImage='DefaultFolder.png')
         li.setThumbnailImage('http:' + show_image)
-        li.addContextMenuItems([(my_addon.getLocalizedString(30006), 'XBMC.RunPlugin(%s)' % build_url({"level": "show", "show_url": show_url, "mode": ShowMode.PLAY_ALL})),
-                                (my_addon.getLocalizedString(30007), 'XBMC.RunPlugin(%s)' % build_url({"level": "show", "show_url": show_url, "mode": ShowMode.SHUFFLE_PLAY}))])
+        li.addContextMenuItems([(my_addon.getLocalizedString(30006), 'RunPlugin(%s)' % build_url({'level': 'show', 'show_url': show_url, 'mode': ShowMode.PLAY_ALL})),
+                                (my_addon.getLocalizedString(30007), 'RunPlugin(%s)' % build_url({'level': 'show', 'show_url': show_url, 'mode': ShowMode.SHUFFLE_PLAY}))])
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif level[0] == 'show':
@@ -55,10 +62,15 @@ elif level[0] == 'show':
     response = url.read()
 
     episodes = re.findall('data-episode-id="(\d+)"', response, re.I)
-    # TODO: notify if episodes are empty and exit to catalogue
+    # notify if episodes are empty log error and return to catalogue
+    if not episodes:
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30009), NOTIFY_DURATION, my_addon_icon))
+        xbmc.executebuiltin('RunPlugin(%s)' % base_url)
+        sys.exit()
 
     # settings (0=Low, 1=Medium, 2=High)
     quality = int(my_addon.getSetting('quality')) + 1
+    thumbnails = my_addon.getSetting('download_ep_thumbnails')
 
     if mode == ShowMode.PLAY_ALL or mode == ShowMode.SHUFFLE_PLAY:
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -68,32 +80,42 @@ elif level[0] == 'show':
         url = urllib.urlopen('http://www.stream.cz/ajax/get_video_source?context=catalogue&id=' + episode_id)
         response = url.read()
 
-        episode = json.loads(response)
-        # TODO: notify if episode(json) is not load properly and exit to catalogue
+        try:
+            episode = json.loads(response)
+        except ValueError:
+            continue
 
         episode_name = episode['episode_name']
         episode_url = episode['instances'][quality]['instances'][0]['source']
-        episode_type = episode['instances'][quality]['instances'][0]['type']
-        episode_height = episode['instances'][quality]['instances'][0]['quality'][:3]
-        episode_duration = episode['duration']
-        episode_aspect = episode['aspect_ratio']
 
         li = xbmcgui.ListItem(episode_name, iconImage='DefaultVideo.png')
-        li.addStreamInfo('video', {'codec': episode_type, 'aspect': episode_aspect, 'height': episode_height, 'duration': episode_duration})
-        li.addStreamInfo('audio', {'language': 'cs'})
-        if my_addon.getSetting('download_ep_thumbnails') == 'true':
+        if thumbnails == 'true':
             episode_image = 'http:' + episode['episode_image_original_url'] + '.jpg'
             li.setThumbnailImage(episode_image)
 
         if mode == ShowMode.PLAY_ALL or mode == ShowMode.SHUFFLE_PLAY:
             playlist.add(url=episode_url, listitem=li)
         else:
+            episode_type = episode['instances'][quality]['instances'][0]['type']
+            episode_aspect = episode['aspect_ratio']
+            episode_height = episode['instances'][quality]['instances'][0]['quality'][:3]
+            episode_duration = episode['duration']
+            
+            li.addStreamInfo('video', {'codec': episode_type, 'aspect': episode_aspect, 'height': episode_height, 'duration': episode_duration})
+            li.addStreamInfo('audio', {'language': 'cs'})
+            
             xbmcplugin.addDirectoryItem(handle=addon_handle, url=episode_url, listitem=li)
 
     if mode == ShowMode.PLAY_ALL:
         xbmc.Player().play(playlist)
+        print my_addon_name
+        print my_addon.getLocalizedString(30006)
+        print NOTIFY_DURATION
+        print my_addon_icon
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30006), NOTIFY_DURATION, my_addon_icon))
     elif mode == ShowMode.SHUFFLE_PLAY:
         playlist.shuffle()
         xbmc.Player().play(playlist)
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30007), NOTIFY_DURATION, my_addon_icon))
 
 xbmcplugin.endOfDirectory(addon_handle)

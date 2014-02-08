@@ -1,3 +1,7 @@
+v0.0.4
+- Improved performance
+- Added error handling and notifications
+
 v0.0.3
 - Added Download episode thumbnails setting
 - Play all and Shuffle play added to context menu

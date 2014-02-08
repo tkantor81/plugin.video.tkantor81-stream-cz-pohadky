@@ -52,3 +52,13 @@ msgstr "Přehrát vše"
 msgctxt "#30007"
 msgid "Shuffle play"
 msgstr "Náhodné přehrávání"
+
+# Notifications
+
+msgctxt "#30008"
+msgid "Can't load fairy tales catalogue"
+msgstr "Seznam pohádek nelze načíst"
+
+msgctxt "#30009"
+msgid "Can't load episodes"
+msgstr "Seznam epizod nelze načíst"
