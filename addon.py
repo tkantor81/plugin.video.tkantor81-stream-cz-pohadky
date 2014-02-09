@@ -1,3 +1,19 @@
+#    XBMC Plugin Add-on: Stream.cz - Pohadky
+#    Copyright (C) 2014  tkantor81 (tkantor81@gmail.com)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import xbmc
 import xbmcgui
 import xbmcaddon
@@ -33,8 +49,6 @@ my_addon_icon = my_addon.getAddonInfo('icon')
 level = args.get('level', None)
 xbmcplugin.setContent(addon_handle, 'movies')
 
-# TODO: create notifications for newly added shows (configurable)
-
 if level is None:
     url = urllib.urlopen('http://www.stream.cz/ajax/get_catalogue?dreams')
     parser = HTMLParser.HTMLParser()
@@ -56,8 +70,17 @@ if level is None:
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=li, isFolder=True)
 
 elif level[0] == 'show':
-    show_url = args['show_url'][0]
     mode = int(args['mode'][0])
+    if mode == ShowMode.PLAY_ALL:
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30006).encode('UTF-8'), NOTIFY_DURATION, my_addon_icon))
+        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+        playlist.clear()
+    elif mode == ShowMode.SHUFFLE_PLAY:
+        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30007).encode('UTF-8'), NOTIFY_DURATION, my_addon_icon))
+        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+        playlist.clear()
+
+    show_url = args['show_url'][0]
     url = urllib.urlopen('http://www.stream.cz/ajax/get_series?show_url=' + show_url)
     response = url.read()
 
@@ -71,10 +94,6 @@ elif level[0] == 'show':
     # settings (0=Low, 1=Medium, 2=High)
     quality = int(my_addon.getSetting('quality')) + 1
     thumbnails = my_addon.getSetting('download_ep_thumbnails')
-
-    if mode == ShowMode.PLAY_ALL or mode == ShowMode.SHUFFLE_PLAY:
-        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-        playlist.clear()
 
     for episode_id in episodes:
         url = urllib.urlopen('http://www.stream.cz/ajax/get_video_source?context=catalogue&id=' + episode_id)
@@ -107,10 +126,8 @@ elif level[0] == 'show':
             xbmcplugin.addDirectoryItem(handle=addon_handle, url=episode_url, listitem=li)
 
     if mode == ShowMode.PLAY_ALL:
-        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30006).encode('UTF-8'), NOTIFY_DURATION, my_addon_icon))
         xbmc.Player().play(playlist)
     elif mode == ShowMode.SHUFFLE_PLAY:
-        xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (my_addon_name, my_addon.getLocalizedString(30007).encode('UTF-8'), NOTIFY_DURATION, my_addon_icon))
         playlist.shuffle()
         xbmc.Player().play(playlist)
 
