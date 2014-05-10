@@ -26,17 +26,18 @@ import HTMLParser
 #     print title
 
 
-show_url = 'mach-a-sebestova'
+show_url = 'raju-v-jednom-kole'
 url = urllib.urlopen('http://www.stream.cz/ajax/get_series?show_url=' + show_url)
 response = url.read()
 episodes = re.findall('data-episode-id="(\d*)"', response)
 
 for episode_id in episodes:
     quality = 3
+    print 'http://www.stream.cz/ajax/get_video_source?context=catalogue&id=' + episode_id
     url = urllib.urlopen('http://www.stream.cz/ajax/get_video_source?context=catalogue&id=' + episode_id)
     response = url.read()
     try:
-        episode = json.loads('')
+        episode = json.loads(response)
     except ValueError:
         print 'error'
         sys.exit()

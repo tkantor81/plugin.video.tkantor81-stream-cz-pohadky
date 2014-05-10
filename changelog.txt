@@ -1,3 +1,6 @@
+v0.0.5
+- Fixed stream quality selection
+
 v0.0.4
 - Improved performance
 - Added error handling and notifications

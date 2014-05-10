@@ -104,26 +104,33 @@ elif level[0] == 'show':
         except ValueError:
             continue
 
-        episode_name = episode['episode_name']
-        episode_url = episode['instances'][quality]['instances'][0]['source']
+        episode_found = False
+        for episode_quality in range(quality, -1, -1):
+            if episode['instances'][episode_quality]['instances']:
+                episode_found = True
+                break
 
-        li = xbmcgui.ListItem(episode_name, iconImage='DefaultVideo.png')
-        if thumbnails == 'true':
-            episode_image = 'http:' + episode['episode_image_original_url'] + '.jpg'
-            li.setThumbnailImage(episode_image)
+        if episode_found:
+            episode_name = episode['episode_name']
+            episode_url = episode['instances'][episode_quality]['instances'][0]['source']
 
-        if mode == ShowMode.PLAY_ALL or mode == ShowMode.SHUFFLE_PLAY:
-            playlist.add(url=episode_url, listitem=li)
-        else:
-            episode_type = episode['instances'][quality]['instances'][0]['type']
-            episode_aspect = episode['aspect_ratio']
-            episode_height = episode['instances'][quality]['instances'][0]['quality'][:3]
-            episode_duration = episode['duration']
-            
-            li.addStreamInfo('video', {'codec': episode_type, 'aspect': episode_aspect, 'height': episode_height, 'duration': episode_duration})
-            li.addStreamInfo('audio', {'language': 'cs'})
-            
-            xbmcplugin.addDirectoryItem(handle=addon_handle, url=episode_url, listitem=li)
+            li = xbmcgui.ListItem(episode_name, iconImage='DefaultVideo.png')
+            if thumbnails == 'true':
+                episode_image = 'http:' + episode['episode_image_original_url'] + '.jpg'
+                li.setThumbnailImage(episode_image)
+
+            if mode == ShowMode.PLAY_ALL or mode == ShowMode.SHUFFLE_PLAY:
+                playlist.add(url=episode_url, listitem=li)
+            else:
+                episode_type = episode['instances'][episode_quality]['instances'][0]['type']
+                episode_aspect = episode['aspect_ratio']
+                episode_height = episode['instances'][episode_quality]['instances'][0]['quality'][:3]
+                episode_duration = episode['duration']
+
+                li.addStreamInfo('video', {'codec': episode_type, 'aspect': episode_aspect, 'height': episode_height, 'duration': episode_duration})
+                li.addStreamInfo('audio', {'language': 'cs'})
+
+                xbmcplugin.addDirectoryItem(handle=addon_handle, url=episode_url, listitem=li)
 
     if mode == ShowMode.PLAY_ALL:
         xbmc.Player().play(playlist)
