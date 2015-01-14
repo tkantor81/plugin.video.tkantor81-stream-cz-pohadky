@@ -28,37 +28,45 @@ msgid "Quality"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Low"
+msgid "Very low"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Medium"
+msgid "Low"
 msgstr ""
 
 msgctxt "#30004"
-msgid "High"
+msgid "Medium"
 msgstr ""
 
 msgctxt "#30005"
+msgid "High"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Full HD"
+msgstr ""
+
+msgctxt "#30007"
 msgid "Download episode thumbnails"
 msgstr ""
 
 # Context menu
 
-msgctxt "#30006"
+msgctxt "#30008"
 msgid "Play all"
 msgstr ""
 
-msgctxt "#30007"
+msgctxt "#30009"
 msgid "Shuffle play"
 msgstr ""
 
 # Notifications
 
-msgctxt "#30008"
+msgctxt "#30010"
 msgid "Can't load fairy tales catalogue"
 msgstr ""
 
-msgctxt "#30009"
+msgctxt "#30011"
 msgid "Can't load episodes"
 msgstr ""

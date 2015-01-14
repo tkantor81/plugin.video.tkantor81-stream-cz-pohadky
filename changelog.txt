@@ -1,3 +1,7 @@
+v0.0.6
+- Changes related to the new Stream.cz web pages
+- Added support for Full HD quality streams
+
 v0.0.5
 - Fixed stream quality selection
 

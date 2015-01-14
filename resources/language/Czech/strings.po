@@ -28,37 +28,45 @@ msgid "Quality"
 msgstr "Kvalita"
 
 msgctxt "#30002"
+msgid "Very low"
+msgstr "Velmi nízká"
+
+msgctxt "#30003"
 msgid "Low"
 msgstr "Nízká"
 
-msgctxt "#30003"
+msgctxt "#30004"
 msgid "Medium"
 msgstr "Střední"
 
-msgctxt "#30004"
+msgctxt "#30005"
 msgid "High"
 msgstr "Vysoká"
 
-msgctxt "#30005"
+msgctxt "#30006"
+msgid "Full HD"
+msgstr "Full HD"
+
+msgctxt "#30007"
 msgid "Download episode thumbnails"
 msgstr "Stahovat náhledy epizod"
 
 # Context menu
 
-msgctxt "#30006"
+msgctxt "#30008"
 msgid "Play all"
 msgstr "Přehrát vše"
 
-msgctxt "#30007"
+msgctxt "#30009"
 msgid "Shuffle play"
 msgstr "Náhodné přehrávání"
 
 # Notifications
 
-msgctxt "#30008"
+msgctxt "#30010"
 msgid "Can't load fairy tales catalogue"
 msgstr "Seznam pohádek nelze načíst"
 
-msgctxt "#30009"
+msgctxt "#30011"
 msgid "Can't load episodes"
 msgstr "Seznam epizod nelze načíst"

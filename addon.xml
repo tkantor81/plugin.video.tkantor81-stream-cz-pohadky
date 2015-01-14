@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.tkantor81-stream-cz-pohadky" name="Stream.cz - Pohádky" version="0.0.5" provider-name="tkantor81">
+<addon id="plugin.video.tkantor81-stream-cz-pohadky" name="Stream.cz - Pohádky" version="0.0.6" provider-name="tkantor81">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
     </requires>
@@ -11,7 +11,7 @@
     <extension point="xbmc.addon.metadata">
         <summary lang="en">Stream.cz - Fairy tales (in Czech)</summary>
         <summary lang="cs">Stream.cz - Pohádky</summary>
-        <description lang="en">You can continually watching fairy tales in new section on Stream.cz. Fairy tales menu will be refreshed every two weeks. Have fun!</description>
+        <description lang="en">You can continually watching fairy tales in the new section on Stream.cz. Fairy tales menu will be refreshed every two weeks. Have fun!</description>
         <description lang="cs">V nové sekci na Stream.cz můžete nepřetržitě sledovat pohádky. Každých 14 dní budeme nabídku pohádek obměňovat. Hezkou zábavu!</description>
         <disclaimer lang="en"></disclaimer>
         <disclaimer lang="cs"></disclaimer>
