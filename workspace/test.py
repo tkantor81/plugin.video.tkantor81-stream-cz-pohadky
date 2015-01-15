@@ -25,7 +25,7 @@ for show in range(0, len(catalogue['_embedded']['stream:show'])):
     print show_url, show_name, show_image
 
 
-url = urllib.urlopen(STREAM_URL + 'show/kulata-pohadka')
+url = urllib.urlopen(STREAM_URL + 'show/jezisek')
 response = url.read()
 
 try:
@@ -33,10 +33,13 @@ try:
 except ValueError:
     sys.exit()
 
-print len(episodes['_embedded']['stream:season']['_embedded']['stream:episode'])
-
-for episode in range(0, len(episodes['_embedded']['stream:season']['_embedded']['stream:episode'])):
-    episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode'][episode]['id']
+if isinstance(episodes['_embedded']['stream:season']['_embedded']['stream:episode'], list):
+    print len(episodes['_embedded']['stream:season']['_embedded']['stream:episode'])
+    for episode in range(0, len(episodes['_embedded']['stream:season']['_embedded']['stream:episode'])):
+        episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode'][episode]['id']
+        print episode_id
+else:
+    episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode']['id']
     print episode_id
 
 

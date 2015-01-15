@@ -50,6 +50,45 @@ my_addon_icon = my_addon.getAddonInfo('icon')
 level = args.get('level', None)
 xbmcplugin.setContent(addon_handle, 'movies')
 
+
+def process_episode():
+    url = urllib.urlopen(STREAM_URL + 'episode/' + str(episode_id))
+    response = url.read()
+
+    try:
+        episode = json.loads(response)
+    except ValueError:
+        return
+
+    episode_found = False
+    for ep_quality_index in range(quality, -1, -1):
+        if ep_quality_index <= len(episode['video_qualities']) - 1:
+            episode_found = True
+            break
+
+    if episode_found:
+        episode_name = episode['name']
+        episode_url = episode['video_qualities'][ep_quality_index]['formats'][0]['source']
+
+        li = xbmcgui.ListItem(episode_name, iconImage='DefaultVideo.png')
+        if thumbnails == 'true':
+            episode_image = re.findall('.+?(?=/\{width\}/\{height\})', episode['image'], re.I)
+            li.setThumbnailImage('http:' + episode_image[0])
+
+        if mode == ShowMode.PLAY_ALL or mode == ShowMode.SHUFFLE_PLAY:
+            playlist.add(url=episode_url, listitem=li)
+        else:
+            episode_type = episode['video_qualities'][ep_quality_index]['formats'][0]['type']
+            episode_aspect = episode['aspect_ratio']
+            episode_height = episode['video_qualities'][ep_quality_index]['formats'][0]['quality'][:3]
+            episode_duration = episode['duration']
+
+            li.addStreamInfo('video', {'codec': episode_type, 'aspect': episode_aspect, 'height': episode_height, 'duration': episode_duration})
+            li.addStreamInfo('audio', {'language': 'cs'})
+
+            xbmcplugin.addDirectoryItem(handle=addon_handle, url=episode_url, listitem=li)
+    return
+
 if level is None:
     url = urllib.urlopen(STREAM_URL + 'catalogue?channels=3')
     response = url.read()
@@ -61,10 +100,10 @@ if level is None:
         xbmc.executebuiltin('ReplaceWindow(Home)')
         sys.exit()
 
-    for show in range(0, len(catalogue['_embedded']['stream:show'])):
-        show_url = catalogue['_embedded']['stream:show'][show]['url_name']
-        show_name = catalogue['_embedded']['stream:show'][show]['name']
-        show_image = re.findall('.+?(?=/\{width\}/\{height\})', catalogue['_embedded']['stream:show'][show]['image'], re.I)
+    for show_index in range(0, len(catalogue['_embedded']['stream:show'])):
+        show_url = catalogue['_embedded']['stream:show'][show_index]['url_name']
+        show_name = catalogue['_embedded']['stream:show'][show_index]['name']
+        show_image = re.findall('.+?(?=/\{width\}/\{height\})', catalogue['_embedded']['stream:show'][show_index]['image'], re.I)
 
         url = build_url({'level': 'show', 'show_url': show_url, 'mode': ShowMode.LIST_EPISODES})
         li = xbmcgui.ListItem(show_name, iconImage='DefaultFolder.png')
@@ -99,43 +138,13 @@ elif level[0] == 'show':
     quality = int(my_addon.getSetting('quality'))
     thumbnails = my_addon.getSetting('download_ep_thumbnails')
 
-    for episode in range(0, len(episodes['_embedded']['stream:season']['_embedded']['stream:episode'])):
-        episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode'][episode]['id']
-        url = urllib.urlopen(STREAM_URL + 'episode/' + str(episode_id))
-        response = url.read()
-
-        try:
-            episode = json.loads(response)
-        except ValueError:
-            continue
-
-        episode_found = False
-        for episode_quality in range(quality, -1, -1):
-            if episode['video_qualities'][episode_quality]['formats']:
-                episode_found = True
-                break
-
-        if episode_found:
-            episode_name = episode['name']
-            episode_url = episode['video_qualities'][episode_quality]['formats'][0]['source']
-
-            li = xbmcgui.ListItem(episode_name, iconImage='DefaultVideo.png')
-            if thumbnails == 'true':
-                episode_image = re.findall('.+?(?=/\{width\}/\{height\})', episode['image'], re.I)
-                li.setThumbnailImage('http:' + episode_image[0])
-
-            if mode == ShowMode.PLAY_ALL or mode == ShowMode.SHUFFLE_PLAY:
-                playlist.add(url=episode_url, listitem=li)
-            else:
-                episode_type = episode['video_qualities'][episode_quality]['formats'][0]['type']
-                episode_aspect = episode['aspect_ratio']
-                episode_height = episode['video_qualities'][episode_quality]['formats'][0]['quality'][:3]
-                episode_duration = episode['duration']
-
-                li.addStreamInfo('video', {'codec': episode_type, 'aspect': episode_aspect, 'height': episode_height, 'duration': episode_duration})
-                li.addStreamInfo('audio', {'language': 'cs'})
-
-                xbmcplugin.addDirectoryItem(handle=addon_handle, url=episode_url, listitem=li)
+    if isinstance(episodes['_embedded']['stream:season']['_embedded']['stream:episode'], list):
+        for episode_index in range(0, len(episodes['_embedded']['stream:season']['_embedded']['stream:episode'])):
+            episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode'][episode_index]['id']
+            process_episode()
+    else:
+        episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode']['id']
+        process_episode()
 
     if mode == ShowMode.PLAY_ALL:
         xbmc.Player().play(playlist)
