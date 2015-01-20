@@ -138,13 +138,23 @@ elif level[0] == 'show':
     quality = int(my_addon.getSetting('quality'))
     thumbnails = my_addon.getSetting('download_ep_thumbnails')
 
-    if isinstance(episodes['_embedded']['stream:season']['_embedded']['stream:episode'], list):
-        for episode_index in range(0, len(episodes['_embedded']['stream:season']['_embedded']['stream:episode'])):
-            episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode'][episode_index]['id']
-            process_episode()
+    if isinstance(episodes['_embedded']['stream:season'], list):
+        for season_index in range(0, len(episodes['_embedded']['stream:season'])):
+            if isinstance(episodes['_embedded']['stream:season'][season_index]['_embedded']['stream:episode'], list):
+                for episode_index in range(0, len(episodes['_embedded']['stream:season'][season_index]['_embedded']['stream:episode'])):
+                    episode_id = episodes['_embedded']['stream:season'][season_index]['_embedded']['stream:episode'][episode_index]['id']
+                    process_episode()
+            else:
+                episode_id = episodes['_embedded']['stream:season'][season_index]['_embedded']['stream:episode']['id']
+                process_episode()
     else:
-        episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode']['id']
-        process_episode()
+        if isinstance(episodes['_embedded']['stream:season']['_embedded']['stream:episode'], list):
+            for episode_index in range(0, len(episodes['_embedded']['stream:season']['_embedded']['stream:episode'])):
+                episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode'][episode_index]['id']
+                process_episode()
+        else:
+            episode_id = episodes['_embedded']['stream:season']['_embedded']['stream:episode']['id']
+            process_episode()
 
     if mode == ShowMode.PLAY_ALL:
         xbmc.Player().play(playlist)
